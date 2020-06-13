@@ -1,0 +1,5 @@
+# Kotlin Matrix
+
+This is some code I am in the process of writing that has the ability to do matrix algebra using Kotlin. This is an evolution of another project of mine where I computed matrix multiplication, determinants, and inverses using Java. I chose Kotlin for this project because of the ability to overload operators, a useful feature when working with three custom data strutures (complex numbers, vectors, and matrices). I implemented my own complex number class as my Java versions were not able to work with complex numbers (they used doubles in the main matrix table). In anticipation of complex eigenvalues and eigenvectors, I spent some time implementing a complex number based matrix table.
+
+Currently, the program can compute matrix multiplication as well as Gaussian elimination. I will be reusing the algorithms for determinants and inverses from my previous work in Java to implement the respective functions in this project. Future goals include implementing different kinds of matrix decompositions, as well as the QR algorithm in order to find eigenvalues and eigenvectors of matrices.
