@@ -1,44 +1,71 @@
-data class Complex(val real: Double, val imaginary: Double) {
-    constructor(real: Double): this(real, 0.0)
+import kotlin.math.sqrt
+
+data class Complex(val real: Numeric, val imaginary: Numeric): Numeric {
+    override fun magnitude(): Double {
+        return sqrt((real * real).magnitude() + (imaginary * imaginary).magnitude())
+    }
 
     fun conjugate(): Complex {
         return Complex(real, -imaginary)
     }
 
-    operator fun unaryMinus(): Complex {
+    override operator fun unaryMinus(): Numeric {
         return Complex(-real, -imaginary)
     }
 
-    operator fun plus(z: Complex): Complex {
-        val a = real + z.real
-        val b = imaginary + z.imaginary
-        return Complex(a, b)
+    override operator fun plus(n: Numeric): Numeric {
+        val z = n.toComplex()
+        return Complex(z.real + real, z.imaginary + imaginary)
     }
 
-    operator fun minus(z: Complex): Complex {
-        return plus(-z)
+    operator fun plus(f: Fraction): Fraction {
+        val r = real * f.denominator + f.numerator
+        val i = imaginary * f.denominator + f.numerator
+        return Fraction(Complex(r, i), f.denominator)
     }
 
-    operator fun times(z: Complex): Complex {
-        val a = real * z.real - imaginary * z.imaginary;
-        val b = real * z.imaginary + imaginary * z.real;
-        return Complex(a, b);
+    override operator fun minus(n: Numeric): Numeric {
+        return this + -n
     }
 
-    operator fun div(z: Complex): Complex {
+    override operator fun times(n: Numeric): Numeric {
+        val z = n.toComplex()
+        val r = real * z.real - imaginary * z.imaginary
+        val i = real * z.imaginary + imaginary * z.real
+        return if (i == Integer.ZERO) { r } else { Complex(r, i) }
+    }
+
+    operator fun times(f: Fraction): Fraction {
+        val r = real * f.numerator
+        val i = imaginary * f.numerator
+        return Fraction(Complex(r, i), f.denominator)
+    }
+
+    override operator fun div(n: Numeric): Numeric {
+        val z = n.toComplex()
         val conjugate = z.conjugate()
-        val product = this * conjugate
-        val denominator = z * conjugate
-        return Complex(product.real / denominator.real, product.imaginary / denominator.real)
+        return Fraction((this * conjugate), (z * conjugate))
+    }
+
+    override operator fun compareTo(n: Numeric): Int {
+        return (this.magnitude() - n.magnitude()).toInt()
+    }
+
+    override fun toComplex(): Complex {
+        return this
+    }
+
+    override fun toFraction(): Fraction {
+        return Fraction(this, Integer.ONE)
     }
 
     override fun toString(): String {
         var string = "%.3e".format(real)
-        if (real >= 0) {
+        if (real >= Integer.ZERO) {
             string = " $string"
         }
 
-        return if (imaginary == 0.0) {
+        return if (imaginary == Integer.ZERO) {
             string
         } else {
             "$string + %.3e i".format(imaginary)

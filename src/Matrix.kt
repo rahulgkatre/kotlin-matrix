@@ -1,4 +1,4 @@
-data class Matrix(val entries: Array<Array<Complex>>) {
+data class Matrix(val entries: Array<Array<Numeric>>) {
     val steps = true
 
     val rows: Int = entries.size
@@ -12,25 +12,14 @@ data class Matrix(val entries: Array<Array<Complex>>) {
         return Vector(Array(rows) { i -> entries[i][j] } )
     }
 
+    fun identity(): Matrix {
+        val array = Array(rows) { i-> Array<Numeric>(columns) { j -> if (i == j) Integer.ONE else Integer.ZERO } }
+        return Matrix(array)
+    }
+
     fun augment(m: Matrix): Matrix {
         assert(rows == m.rows)
-        val left = entries
-        val right = m.entries
-        val join = Array(rows) { i -> Array(columns + m.columns) {Complex(0.0)} }
-
-        for (i in left.indices) {
-            for (j in left[i].indices) {
-                join[i][j] = left[i][j]
-            }
-        }
-
-        for (i in right.indices) {
-            for (j in right[i].indices) {
-                join[i][j + columns] = right[i][j]
-            }
-        }
-
-        return Matrix(join)
+        return Matrix(Array(rows) { i -> Array(columns + m.columns) { j -> if (j < columns) entries[i][j] else m.entries[i][j - columns] } } )
     }
 
     fun transpose(): Matrix {
@@ -50,8 +39,8 @@ data class Matrix(val entries: Array<Array<Complex>>) {
         return plus(-m)
     }
 
-    operator fun times(z: Complex): Matrix {
-        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] * z } } )
+    operator fun times(n: Numeric): Matrix {
+        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] * n } } )
     }
 
     operator fun times(m: Matrix): Matrix {
@@ -61,14 +50,14 @@ data class Matrix(val entries: Array<Array<Complex>>) {
 
     fun ref(): Matrix {
         if (rows > 0 && columns > 0) {
-            val copy: Array<Array<Complex>> = entries.copyOf()
+            val copy: Array<Array<Numeric>> = entries.copyOf()
             var currentColumnIndex = 0
             var previousPivotIndex = 0
             while (currentColumnIndex < columns) {
-                val currentColumn: Array<Complex> = column(currentColumnIndex).elements
+                val currentColumn: Array<Numeric> = column(currentColumnIndex).elements
                 var pivotRowIndex: Int = -1
                 for (i in previousPivotIndex until rows) {
-                    if (currentColumn[i].real != 0.0 || currentColumn[i].imaginary != 0.0) {
+                    if (currentColumn[i].magnitude() != 0.0) {
                         pivotRowIndex = i
                         break
                     }
@@ -83,11 +72,13 @@ data class Matrix(val entries: Array<Array<Complex>>) {
 
                     val pivotRow = Vector(copy[previousPivotIndex])
                     val pivot = pivotRow.elements[currentColumnIndex]
+                    val pivotScalar = Fraction(Integer.ONE, pivot)
+                    copy[previousPivotIndex] = (pivotRow * pivotScalar).elements
 
                     for (i in previousPivotIndex + 1 until rows) {
                         val currentRow = Vector(copy[i])
                         val leadingEntry = currentRow.elements[currentColumnIndex]
-                        val scalar = leadingEntry / pivot
+                        val scalar = Fraction(leadingEntry, pivot)
                         val scaledPivotRow = pivotRow * scalar
                         val reducedRow = currentRow - scaledPivotRow
                         copy[i] = reducedRow.elements
@@ -110,10 +101,10 @@ data class Matrix(val entries: Array<Array<Complex>>) {
             var currentColumnIndex = 0
             var previousPivotIndex = 0
             while (currentColumnIndex < columns) {
-                val currentColumn: Array<Complex> = column(currentColumnIndex).elements
+                val currentColumn: Array<Numeric> = column(currentColumnIndex).elements
                 var pivotRowIndex: Int = -1
                 for (i in previousPivotIndex until rows) {
-                    if (currentColumn[i].real != 0.0 || currentColumn[i].imaginary != 0.0) {
+                    if (currentColumn[i].magnitude() != 0.0) {
                         pivotRowIndex = i
                         break
                     }
@@ -128,14 +119,14 @@ data class Matrix(val entries: Array<Array<Complex>>) {
 
                     val pivotRow = Vector(copy[previousPivotIndex])
                     val pivot = pivotRow.elements[currentColumnIndex]
-                    val pivotScalar = Complex(1.0) / pivot
+                    val pivotScalar = Fraction(Integer.ONE, pivot)
                     copy[previousPivotIndex] = (pivotRow * pivotScalar).elements
 
                     for (i in 0 until rows) {
                         if (i != previousPivotIndex) {
                             val currentRow = Vector(copy[i])
                             val leadingEntry = currentRow.elements[currentColumnIndex]
-                            val scalar = leadingEntry / pivot
+                            val scalar = Fraction(leadingEntry, pivot)
                             val scaledPivotRow = pivotRow * scalar
                             val reducedRow = currentRow - scaledPivotRow
                             copy[i] = reducedRow.elements
@@ -151,6 +142,13 @@ data class Matrix(val entries: Array<Array<Complex>>) {
         } else {
             return this
         }
+    }
+
+    fun inverse(): Matrix {
+        val augmented = augment(identity()).rref()
+        val left = Matrix(Array(rows) { i -> Array(columns) { j -> augmented.entries[i][j] } } )
+        val right =  Matrix(Array(rows) { i -> Array(columns) { j -> augmented.entries[i][j + columns] } } )
+        return right
     }
 
     override fun equals(other: Any?): Boolean {

@@ -1,20 +1,5 @@
-import kotlin.math.sqrt
-
-data class Vector(val elements: Array<Complex>) {
+data class Vector(val elements: Array<Numeric>) {
     val dimension = elements.size
-
-    fun magnitude(): Complex {
-        var sum = 0.0
-        for (element in elements) {
-            sum += (element * element).real
-        }
-
-        return Complex(sqrt(sum))
-    }
-
-    fun normalize(): Vector {
-        return this / magnitude()
-    }
 
     operator fun unaryMinus(): Vector {
         return Vector(Array(dimension) { i -> -elements[i] } )
@@ -28,17 +13,17 @@ data class Vector(val elements: Array<Complex>) {
         return plus(-v)
     }
 
-    operator fun times(z: Complex): Vector {
-        return Vector(Array(dimension) { i -> elements[i] * z } )
+    operator fun times(n: Numeric): Vector {
+        return Vector(Array(dimension) { i -> elements[i] * n } )
     }
 
     operator fun div(z: Complex): Vector {
         return Vector(Array(dimension) { i -> elements[i] / z } )
     }
 
-    fun dot(v: Vector): Complex {
+    fun dot(v: Vector): Numeric {
         assert(dimension == v.dimension)
-        var sum = Complex(0.0, 0.0)
+        var sum: Numeric = Integer.ZERO
         for (i in elements.indices) {
             sum += elements[i] * v.elements[i]
         }
@@ -52,6 +37,6 @@ data class Vector(val elements: Array<Complex>) {
             output += "$element  "
         }
 
-        return "$output ]"
+        return "$output]"
     }
 }
