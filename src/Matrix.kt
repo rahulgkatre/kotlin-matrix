@@ -11,7 +11,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
     }
 
     fun augment(m: Matrix): AugmentedMatrix {
-        return AugmentedMatrix.augment(this, identity(rows))
+        return AugmentedMatrix.augment(this, m)
     }
 
     fun row(i: Int): Vector {
