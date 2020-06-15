@@ -73,7 +73,7 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
 
     override fun toString(): String {
         if (denominator == Complex.ONE) {
-            return " %s ".format(numerator)
+            return " %3s ".format(numerator)
         } else {
             return " %3s / %-3s ".format(numerator, denominator)
         }

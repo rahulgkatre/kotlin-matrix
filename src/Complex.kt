@@ -20,12 +20,12 @@ data class Complex(val real: Int, val imaginary: Int) {
         return Complex(-real, -imaginary)
     }
 
-    operator fun plus(i: Int): Complex {
-        return Complex(real + i, imaginary)
-    }
-
     operator fun plus(f: Fraction): Fraction {
         return Fraction(this * f.denominator + f.numerator, f.denominator)
+    }
+
+    operator fun plus(x: Int): Complex {
+        return Complex(real + x, imaginary)
     }
 
     operator fun plus(z: Complex): Complex {
@@ -34,12 +34,12 @@ data class Complex(val real: Int, val imaginary: Int) {
         return Complex(r, i)
     }
 
-    operator fun minus(i: Int): Complex {
-        return Complex(real - i, imaginary)
-    }
-
     operator fun minus(f: Fraction): Fraction {
         return Fraction(this * f.denominator - f.numerator, f.denominator)
+    }
+
+    operator fun minus(x: Int): Complex {
+        return Complex(real - x, imaginary)
     }
 
     operator fun minus(z: Complex): Complex {
@@ -52,9 +52,9 @@ data class Complex(val real: Int, val imaginary: Int) {
         return Fraction(this * f.numerator, f.denominator)
     }
 
-    operator fun times(i: Int): Complex {
-        val r = real * i
-        val i = imaginary * i
+    operator fun times(x: Int): Complex {
+        val r = real * x
+        val i = imaginary * x
         return Complex(r, i)
     }
 
@@ -68,8 +68,8 @@ data class Complex(val real: Int, val imaginary: Int) {
         return Fraction(this * f.denominator, f.numerator)
     }
 
-    operator fun div(i: Int): Fraction {
-        return Fraction(this, Complex(i, 0))
+    operator fun div(x: Int): Fraction {
+        return Fraction(this, Complex(x, 0))
     }
 
     operator fun div(z: Complex): Fraction {

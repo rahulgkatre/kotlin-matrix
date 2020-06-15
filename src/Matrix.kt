@@ -1,10 +1,18 @@
 import java.lang.Exception
 
 data class Matrix(val entries: Array<Array<Fraction>>) {
-    val steps = true
-
     val rows: Int = entries.size
     val columns: Int = entries[0].size
+
+    companion object {
+        fun identity(size: Int): Matrix {
+            return Matrix(Array(size) { i-> Array(size) { j -> if (i == j) Fraction.ONE else Fraction.ZERO } } )
+        }
+    }
+
+    fun augment(m: Matrix): AugmentedMatrix {
+        return AugmentedMatrix.augment(this, identity(rows))
+    }
 
     fun row(i: Int): Vector {
         return Vector(entries[i])
@@ -15,13 +23,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
     }
 
     fun identity(): Matrix {
-        val array = Array(rows) { i-> Array(columns) { j -> if (i == j) Fraction.ONE else Fraction.ZERO } }
-        return Matrix(array)
-    }
-
-    fun augment(m: Matrix): Matrix {
-        assert(rows == m.rows)
-        return Matrix(Array(rows) { i -> Array(columns + m.columns) { j -> if (j < columns) entries[i][j] else m.entries[i][j - columns] } } )
+        return Matrix(Array(rows) { i-> Array(columns) { j -> if (i == j) Fraction.ONE else Fraction.ZERO } } )
     }
 
     fun transpose(): Matrix {
@@ -149,12 +151,12 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
 
     fun inverse(): Matrix {
         val augmented = augment(identity()).rref()
-        val left = Matrix(Array(rows) { i -> Array(columns) { j -> augmented.entries[i][j] } } )
-        val right =  Matrix(Array(rows) { i -> Array(columns) { j -> augmented.entries[i][j + columns] } } )
+        val left = augmented.left
+        val right = augmented.right
         if (left == identity()) {
             return right
         } else {
-            throw(Exception("Matrix is singular (inverse does not exist)"))
+            throw(Exception("$left\nMatrix is singular (inverse does not exist)"))
         }
     }
 
