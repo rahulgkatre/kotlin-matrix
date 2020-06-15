@@ -1,4 +1,4 @@
-data class Vector(val elements: Array<Numeric>) {
+data class Vector(val elements: Array<Fraction>) {
     val dimension = elements.size
 
     operator fun unaryMinus(): Vector {
@@ -13,17 +13,17 @@ data class Vector(val elements: Array<Numeric>) {
         return plus(-v)
     }
 
-    operator fun times(n: Numeric): Vector {
-        return Vector(Array(dimension) { i -> elements[i] * n } )
+    operator fun times(f: Fraction): Vector {
+        return Vector(Array(dimension) { i -> elements[i] * f } )
     }
 
-    operator fun div(z: Complex): Vector {
-        return Vector(Array(dimension) { i -> elements[i] / z } )
+    operator fun div(f: Fraction): Vector {
+        return Vector(Array(dimension) { i -> elements[i] / f } )
     }
 
-    fun dot(v: Vector): Numeric {
+    fun dot(v: Vector): Fraction {
         assert(dimension == v.dimension)
-        var sum: Numeric = Integer.ZERO
+        var sum: Fraction = Fraction.ZERO
         for (i in elements.indices) {
             sum += elements[i] * v.elements[i]
         }
@@ -31,10 +31,28 @@ data class Vector(val elements: Array<Numeric>) {
         return sum
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Vector
+
+        if (!elements.contentEquals(other.elements)) return false
+        if (dimension != other.dimension) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = elements.contentHashCode()
+        result = 31 * result + dimension
+        return result
+    }
+
     override fun toString(): String {
         var output = "[ "
         for (element in elements) {
-            output += "$element  "
+            output += "$element "
         }
 
         return "$output]"

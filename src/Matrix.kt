@@ -1,4 +1,6 @@
-data class Matrix(val entries: Array<Array<Numeric>>) {
+import java.lang.Exception
+
+data class Matrix(val entries: Array<Array<Fraction>>) {
     val steps = true
 
     val rows: Int = entries.size
@@ -13,7 +15,7 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
     }
 
     fun identity(): Matrix {
-        val array = Array(rows) { i-> Array<Numeric>(columns) { j -> if (i == j) Integer.ONE else Integer.ZERO } }
+        val array = Array(rows) { i-> Array(columns) { j -> if (i == j) Fraction.ONE else Fraction.ZERO } }
         return Matrix(array)
     }
 
@@ -36,11 +38,12 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
     }
 
     operator fun minus(m: Matrix): Matrix {
-        return plus(-m)
+        assert(rows == m.rows && columns == m.columns)
+        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] + m.entries[i][j] } } )
     }
 
-    operator fun times(n: Numeric): Matrix {
-        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] * n } } )
+    operator fun times(f: Fraction): Matrix {
+        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] * f } } )
     }
 
     operator fun times(m: Matrix): Matrix {
@@ -50,11 +53,11 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
 
     fun ref(): Matrix {
         if (rows > 0 && columns > 0) {
-            val copy: Array<Array<Numeric>> = entries.copyOf()
+            val copy: Array<Array<Fraction>> = entries.copyOf()
             var currentColumnIndex = 0
             var previousPivotIndex = 0
             while (currentColumnIndex < columns) {
-                val currentColumn: Array<Numeric> = column(currentColumnIndex).elements
+                val currentColumn: Array<Fraction> = column(currentColumnIndex).elements
                 var pivotRowIndex: Int = -1
                 for (i in previousPivotIndex until rows) {
                     if (currentColumn[i].magnitude() != 0.0) {
@@ -72,13 +75,13 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
 
                     val pivotRow = Vector(copy[previousPivotIndex])
                     val pivot = pivotRow.elements[currentColumnIndex]
-                    val pivotScalar = Fraction(Integer.ONE, pivot)
+                    val pivotScalar = pivot.invert()
                     copy[previousPivotIndex] = (pivotRow * pivotScalar).elements
 
                     for (i in previousPivotIndex + 1 until rows) {
                         val currentRow = Vector(copy[i])
                         val leadingEntry = currentRow.elements[currentColumnIndex]
-                        val scalar = Fraction(leadingEntry, pivot)
+                        val scalar = leadingEntry * pivotScalar
                         val scaledPivotRow = pivotRow * scalar
                         val reducedRow = currentRow - scaledPivotRow
                         copy[i] = reducedRow.elements
@@ -101,7 +104,7 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
             var currentColumnIndex = 0
             var previousPivotIndex = 0
             while (currentColumnIndex < columns) {
-                val currentColumn: Array<Numeric> = column(currentColumnIndex).elements
+                val currentColumn: Array<Fraction> = column(currentColumnIndex).elements
                 var pivotRowIndex: Int = -1
                 for (i in previousPivotIndex until rows) {
                     if (currentColumn[i].magnitude() != 0.0) {
@@ -119,14 +122,14 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
 
                     val pivotRow = Vector(copy[previousPivotIndex])
                     val pivot = pivotRow.elements[currentColumnIndex]
-                    val pivotScalar = Fraction(Integer.ONE, pivot)
+                    val pivotScalar = pivot.invert()
                     copy[previousPivotIndex] = (pivotRow * pivotScalar).elements
 
                     for (i in 0 until rows) {
                         if (i != previousPivotIndex) {
                             val currentRow = Vector(copy[i])
                             val leadingEntry = currentRow.elements[currentColumnIndex]
-                            val scalar = Fraction(leadingEntry, pivot)
+                            val scalar = leadingEntry * pivotScalar
                             val scaledPivotRow = pivotRow * scalar
                             val reducedRow = currentRow - scaledPivotRow
                             copy[i] = reducedRow.elements
@@ -148,7 +151,11 @@ data class Matrix(val entries: Array<Array<Numeric>>) {
         val augmented = augment(identity()).rref()
         val left = Matrix(Array(rows) { i -> Array(columns) { j -> augmented.entries[i][j] } } )
         val right =  Matrix(Array(rows) { i -> Array(columns) { j -> augmented.entries[i][j + columns] } } )
-        return right
+        if (left == identity()) {
+            return right
+        } else {
+            throw(Exception("Matrix is singular (inverse does not exist)"))
+        }
     }
 
     override fun equals(other: Any?): Boolean {

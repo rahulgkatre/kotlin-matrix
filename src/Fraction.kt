@@ -1,117 +1,81 @@
-data class Fraction(val numerator: Numeric, val denominator: Numeric): Numeric {
+import kotlin.math.abs
+
+data class Fraction(val numerator: Complex, val denominator: Complex) {
+    constructor(numerator: Int, denominator: Int): this(Complex(numerator), Complex(denominator))
+    constructor(numerator: Int): this(Complex(numerator), Complex.ONE)
+
     companion object {
-        fun gcd(n1: Integer, n2: Integer): Integer {
-            return if (n2 == Integer.ZERO) {
-                n1
+        val ZERO = Fraction(Complex.ZERO, Complex.ONE)
+        val ONE = Fraction(Complex.ONE, Complex.ONE)
+
+        fun gcd(n1: Int, n2: Int): Int {
+            if (n2 == 0) {
+                return n1
             } else {
-                gcd(n2, n1 % n2)
+                return gcd(n2, n1 % n2)
             }
         }
     }
 
-    fun simplify(): Numeric {
-        /*
-        if (numerator == denominator) {
-            return Integer.ONE
-        } else if (numerator == Integer.ZERO) {
-            return Integer.ZERO
-        } else if (denominator == Integer.ONE) {
-            return numerator
-        } else {
-            val n = numerator.toFraction().simplify()
-            val d = denominator.toFraction().simplify()
-            return Fraction(n, d)
+    fun simplify(): Fraction {
+        var f = if (denominator.imaginary != 0) { Fraction(numerator * denominator.conjugate(), denominator * denominator.conjugate()) } else { this }
+        val gcd = gcd(gcd(abs(f.numerator.real), abs(f.numerator.imaginary)), abs(f.denominator.real))
+        f = Fraction(Complex(f.numerator.real / gcd, f.numerator.imaginary / gcd), Complex(f.denominator.real / gcd))
+
+        if (f.denominator.real < 0) {
+            f = Fraction(-f.numerator, -f.denominator)
         }
 
-         */
-
-        val f: Fraction
-        if (numerator is Integer && denominator is Integer) {
-            val gcd = gcd(numerator, denominator)
-            var n = numerator.x / gcd.x
-            var d = denominator.x / gcd.x
-
-            if (d < 0) {
-                n = -n
-                d = -d
-            }
-
-            f = Fraction(Integer(n), Integer(d))
-        } else if (numerator is Fraction && denominator is Fraction) {
-            f = Fraction(numerator / denominator, Integer.ONE).toFraction()
-        } else if (numerator is Integer && denominator is Fraction) {
-            f = Fraction(numerator * denominator.denominator, denominator.numerator).toFraction()
-        } else {
-            f = this
+        if (numerator == Complex.ZERO) {
+            f = Fraction(Complex.ZERO, Complex.ONE)
+        } else if (numerator == denominator) {
+            f = Fraction(Complex.ONE, Complex.ONE)
         }
 
-        if (f.numerator == f.denominator) {
-            return Integer.ONE
-        } else if (f.numerator == Integer.ZERO) {
-            return Integer.ZERO
-        } else if (f.denominator == Integer.ONE) {
-            return f.numerator
-        } else {
-            return f
-        }
-
-
-        //TODO: Turn real fractions into Integer, turn complex fractions into Complex, turn everything else into
-        return this
+        return f
     }
 
     fun invert(): Fraction {
         return Fraction(denominator, numerator)
     }
 
-    override fun magnitude(): Double {
+    fun magnitude(): Double {
         return numerator.magnitude() / denominator.magnitude()
     }
 
-    override fun unaryMinus(): Numeric {
+    operator fun unaryMinus(): Fraction {
         return Fraction(-numerator, denominator).simplify()
     }
 
-    override fun plus(n: Numeric): Numeric {
-        val f = n.toFraction()
+    operator fun plus(f: Fraction): Fraction {
         val n = f.numerator * denominator + numerator * f.denominator
         val d = denominator * f.denominator
         return Fraction(n, d).simplify()
     }
 
-    override fun minus(n: Numeric): Numeric {
-        val f = n.toFraction()
-        return -f + this
+    operator fun minus(f: Fraction): Fraction {
+        val n = f.numerator * denominator - numerator * f.denominator
+        val d = denominator * f.denominator
+        return Fraction(n, d).simplify()
     }
 
-    override fun times(n: Numeric): Numeric {
-        val f = n.toFraction()
-        return Fraction(f.numerator * numerator, f.denominator * denominator).simplify()
+    operator fun times(f: Fraction): Fraction {
+        return Fraction(numerator * f.numerator,  denominator * f.denominator).simplify()
     }
 
-    override fun div(n: Numeric): Numeric {
-        return this * n.toFraction().invert()
+    operator fun div(f: Fraction): Fraction {
+        return Fraction(numerator * f.denominator,  denominator * f.numerator).simplify()
     }
 
-    override operator fun compareTo(n: Numeric): Int {
-        return (this.magnitude() - n.magnitude()).toInt()
-    }
-
-    override fun toComplex(): Complex {
-        // Not preferable as this makes it harder to simplify, so Complex handles fraction operations instead
-        // Complex will also convert itself to a proper complex fraction if any of its terms are fractions
-        return Complex(this, Integer.ZERO)
-    }
-
-    override fun toFraction(): Fraction {
-        return this
+    operator fun compareTo(f: Fraction): Int {
+        return (this.magnitude() - f.magnitude()).toInt()
     }
 
     override fun toString(): String {
-        return if (magnitude() >= 0) {
-            "( $numerator / $denominator)"
+        if (denominator == Complex.ONE) {
+            return " %s ".format(numerator)
         } else {
-            "($numerator / $denominator)"
+            return " %3s / %-3s ".format(numerator, denominator)
         }
     }
 }
