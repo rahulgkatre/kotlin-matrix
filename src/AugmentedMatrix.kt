@@ -1,11 +1,9 @@
-class AugmentedMatrix private constructor(val left: Matrix, val right: Matrix) {
-    val matrix = Matrix(Array(left.rows) { i -> Array(left.columns + right.columns) { j -> if (j < left.columns) left.entries[i][j] else right.entries[i][j - left.columns] } } )
+class AugmentedMatrix(val left: Matrix, val right: Matrix) {
+    val matrix: Matrix
 
-    companion object {
-        fun augment(left: Matrix, right: Matrix): AugmentedMatrix {
-            assert(left.rows == right.rows)
-            return AugmentedMatrix(left, right)
-        }
+    init {
+        assert(left.rows == right.rows)
+        this.matrix = Matrix(Array(left.rows) { i -> Array(left.columns + right.columns) { j -> if (j < left.columns) left.entries[i][j] else right.entries[i][j - left.columns] } } )
     }
 
     fun ref(): AugmentedMatrix {

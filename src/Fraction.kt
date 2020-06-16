@@ -9,7 +9,9 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
         val ONE = Fraction(Complex.ONE, Complex.ONE)
 
         fun gcd(n1: Int, n2: Int): Int {
-            if (n2 == 0) {
+            if (n1 == 0 && n2 == 0) {
+                return 1
+            } else if (n2 == 0) {
                 return n1
             } else {
                 return gcd(n2, n1 % n2)
@@ -18,9 +20,17 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
     }
 
     fun simplify(): Fraction {
+        if (denominator.real == 0 && denominator.imaginary == 0) {
+            throw(Exception("Invalid"))
+        }
+
+
         var f = if (denominator.imaginary != 0) { Fraction(numerator * denominator.conjugate(), denominator * denominator.conjugate()) } else { this }
         val gcd = gcd(gcd(abs(f.numerator.real), abs(f.numerator.imaginary)), abs(f.denominator.real))
-        f = Fraction(Complex(f.numerator.real / gcd, f.numerator.imaginary / gcd), Complex(f.denominator.real / gcd))
+
+        if (gcd > 0) {
+            f = Fraction(Complex(f.numerator.real / gcd, f.numerator.imaginary / gcd), Complex(f.denominator.real / gcd))
+        }
 
         if (f.denominator.real < 0) {
             f = Fraction(-f.numerator, -f.denominator)
@@ -73,9 +83,9 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
 
     override fun toString(): String {
         if (denominator == Complex.ONE) {
-            return " %3s ".format(numerator)
+            return "  %-8s".format(numerator)
         } else {
-            return " %3s / %-3s ".format(numerator, denominator)
+            return "%3s / %-3s ".format(numerator, denominator)
         }
     }
 }
