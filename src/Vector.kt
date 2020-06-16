@@ -1,3 +1,5 @@
+package matrix
+
 data class Vector(val elements: Array<Fraction>) {
     val dimension = elements.size
 
@@ -25,7 +27,7 @@ data class Vector(val elements: Array<Fraction>) {
         return elements.maxBy { f -> f.magnitude() } !!
     }
 
-    fun dot(v: Vector): Fraction {
+    operator fun times(v: Vector): Fraction {
         assert(dimension == v.dimension)
         var sum: Fraction = Fraction.ZERO
         for (i in elements.indices) {

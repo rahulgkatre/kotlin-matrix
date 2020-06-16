@@ -1,25 +1,15 @@
+package matrix
+
 import kotlin.math.max
+
+
 
 class AugmentedMatrix(val left: Matrix, val right: Matrix) {
     val matrix: Matrix
 
     init {
         assert(left.rows == right.rows)
-        this.matrix = Matrix(Array(left.rows) { i -> Array(left.columns + right.columns) { j -> if (j < left.columns) left.entries[i][j] else right.entries[i][j - left.columns] } } )
-    }
-
-    fun ref(): AugmentedMatrix {
-        val ref = matrix.ref()
-        val l = Matrix(Array(left.rows) { i -> Array(left.columns) { j -> ref.entries[i][j] } } )
-        val r = Matrix(Array(right.rows) { i -> Array(right.columns) { j -> ref.entries[i][j + left.columns] } } )
-        return AugmentedMatrix(l, r)
-    }
-
-    fun rref(): AugmentedMatrix {
-        val rref = matrix.rref()
-        val l = Matrix(Array(left.rows) { i -> Array(left.columns) { j -> rref.entries[i][j] } } )
-        val r = Matrix(Array(right.rows) { i -> Array(right.columns) { j -> rref.entries[i][j + left.columns] } } )
-        return AugmentedMatrix(l, r)
+        this.matrix = Matrix(Array(left.rows) { i -> Array(left.columns + right.columns) { j -> if (j < left.columns) left.get(i, j) else right.get(i, j - left.columns) } } )
     }
 
     override fun toString(): String {
@@ -28,17 +18,17 @@ class AugmentedMatrix(val left: Matrix, val right: Matrix) {
         for (j in 0 until matrix.columns) {
             var maxLength = 0
             for (i in 0 until matrix.rows) {
-                maxLength = max(matrix.entries[i][j].toString().length, maxLength)
+                maxLength = max(matrix.get(i, j).toString().length, maxLength)
             }
 
             columnWidths[j] = maxLength
         }
 
-        for (i in matrix.entries.indices) {
+        for (i in 0 until matrix.rows) {
             output += "[  "
-            for (j in left.entries[i].indices) {
+            for (j in 0 until left.columns) {
                 val remaining = columnWidths[j]
-                val string = left.entries[i][j].toString()
+                val string = left.get(i, j).toString()
                 output += string
                 for (k in 0 until remaining - string.length + 2) {
                     output += " "
@@ -46,9 +36,9 @@ class AugmentedMatrix(val left: Matrix, val right: Matrix) {
             }
 
             output += "|  "
-            for (j in right.entries[i].indices) {
+            for (j in 0 until right.columns) {
                 val remaining = columnWidths[j + left.columns]
-                val string = right.entries[i][j].toString()
+                val string = right.get(i, j).toString()
                 output += string
                 for (k in 0 until remaining - string.length + 2) {
                     output += " "
