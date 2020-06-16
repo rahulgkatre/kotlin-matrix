@@ -75,40 +75,38 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
             while (currentColumnIndex < rows) {
                 val currentColumn: Array<Fraction> = column(currentColumnIndex).elements
                 var pivotRowIndex: Int = rows - 1
-                var maxColumnValue: Fraction = currentColumn[0]
+                var largestRelativeMax = 0.0
                 for (i in currentPivotRowIndex until rows) {
-                    if (currentColumn[i].magnitude() > maxColumnValue.magnitude()) {
+                    val relativeMax = currentColumn[i].magnitude() / row(i).max().magnitude()
+                    if (relativeMax > largestRelativeMax) {
                         pivotRowIndex = i
-                        maxColumnValue = currentColumn[i]
-                    }
-
-                    if (currentColumn[i].magnitude() != 0.0) {
-                        pivotRowIndex = i
-                        break
+                        largestRelativeMax = relativeMax
                     }
                 }
 
-                if (currentPivotRowIndex != pivotRowIndex) {
-                    val swap = copy[currentPivotRowIndex]
-                    copy[currentPivotRowIndex] = copy[pivotRowIndex]
-                    copy[pivotRowIndex] = swap
-                }
+                if (largestRelativeMax > 0.0) {
+                    if (currentPivotRowIndex != pivotRowIndex) {
+                        val swap = copy[currentPivotRowIndex]
+                        copy[currentPivotRowIndex] = copy[pivotRowIndex]
+                        copy[pivotRowIndex] = swap
+                    }
 
-                val pivotRow = Vector(copy[currentPivotRowIndex])
-                val pivot = pivotRow.elements[currentColumnIndex]
-                val pivotScalar = pivot.invert()
-                if (pivotScalar != Fraction.ONE) {
-                    copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
-                }
+                    val pivotRow = Vector(copy[currentPivotRowIndex])
+                    val pivot = pivotRow.elements[currentColumnIndex]
+                    val pivotScalar = pivot.invert()
+                    if (pivotScalar != Fraction.ONE) {
+                        copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                    }
 
-                for (i in currentPivotRowIndex + 1 until rows) {
-                    if (i != currentPivotRowIndex) {
-                        val currentRow = Vector(copy[i])
-                        val leadingEntry = currentRow.elements[currentColumnIndex]
-                        val scalar = leadingEntry * pivotScalar
-                        val scaledPivotRow = pivotRow * scalar
-                        val reducedRow = currentRow - scaledPivotRow
-                        copy[i] = reducedRow.elements
+                    for (i in currentPivotRowIndex + 1 until rows) {
+                        if (i != currentPivotRowIndex) {
+                            val currentRow = Vector(copy[i])
+                            val leadingEntry = currentRow.elements[currentColumnIndex]
+                            val scalar = leadingEntry * pivotScalar
+                            val scaledPivotRow = pivotRow * scalar
+                            val reducedRow = currentRow - scaledPivotRow
+                            copy[i] = reducedRow.elements
+                        }
                     }
                 }
 
@@ -130,40 +128,38 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
             while (currentColumnIndex < rows) {
                 val currentColumn: Array<Fraction> = column(currentColumnIndex).elements
                 var pivotRowIndex: Int = rows - 1
-                var maxColumnValue: Fraction = currentColumn[0]
+                var largestRelativeMax = 0.0
                 for (i in currentPivotRowIndex until rows) {
-                    if (currentColumn[i].magnitude() > maxColumnValue.magnitude()) {
+                    val relativeMax = currentColumn[i].magnitude() / row(i).max().magnitude()
+                    if (relativeMax > largestRelativeMax) {
                         pivotRowIndex = i
-                        maxColumnValue = currentColumn[i]
-                    }
-
-                    if (currentColumn[i].magnitude() != 0.0) {
-                        pivotRowIndex = i
-                        break
+                        largestRelativeMax = relativeMax
                     }
                 }
 
-                if (currentPivotRowIndex != pivotRowIndex) {
-                    val swap = copy[currentPivotRowIndex]
-                    copy[currentPivotRowIndex] = copy[pivotRowIndex]
-                    copy[pivotRowIndex] = swap
-                }
+                if (largestRelativeMax > 0.0) {
+                    if (currentPivotRowIndex != pivotRowIndex) {
+                        val swap = copy[currentPivotRowIndex]
+                        copy[currentPivotRowIndex] = copy[pivotRowIndex]
+                        copy[pivotRowIndex] = swap
+                    }
 
-                val pivotRow = Vector(copy[currentPivotRowIndex])
-                val pivot = pivotRow.elements[currentColumnIndex]
-                val pivotScalar = pivot.invert()
-                if (pivotScalar != Fraction.ONE) {
-                    copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
-                }
+                    val pivotRow = Vector(copy[currentPivotRowIndex])
+                    val pivot = pivotRow.elements[currentColumnIndex]
+                    val pivotScalar = pivot.invert()
+                    if (pivotScalar != Fraction.ONE) {
+                        copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                    }
 
-                for (i in 0 until rows) {
-                    if (i != currentPivotRowIndex) {
-                        val currentRow = Vector(copy[i])
-                        val leadingEntry = currentRow.elements[currentColumnIndex]
-                        val scalar = leadingEntry * pivotScalar
-                        val scaledPivotRow = pivotRow * scalar
-                        val reducedRow = currentRow - scaledPivotRow
-                        copy[i] = reducedRow.elements
+                    for (i in 0 until rows) {
+                        if (i != currentPivotRowIndex) {
+                            val currentRow = Vector(copy[i])
+                            val leadingEntry = currentRow.elements[currentColumnIndex]
+                            val scalar = leadingEntry * pivotScalar
+                            val scaledPivotRow = pivotRow * scalar
+                            val reducedRow = currentRow - scaledPivotRow
+                            copy[i] = reducedRow.elements
+                        }
                     }
                 }
 
@@ -192,7 +188,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
         if (left == identity()) {
             return right
         } else {
-            throw(Exception("$left\nMatrix is singular (inverse does not exist)"))
+            throw(Exception("$augmented\nMatrix is singular (inverse does not exist)"))
         }
     }
 
@@ -242,6 +238,6 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
             output += "]"
         }
 
-        return output
+        return output + "\n"
     }
 }

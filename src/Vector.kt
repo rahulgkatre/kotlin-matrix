@@ -21,6 +21,10 @@ data class Vector(val elements: Array<Fraction>) {
         return Vector(Array(dimension) { i -> elements[i] / f } )
     }
 
+    fun max(): Fraction {
+        return elements.maxBy { f -> f.magnitude() } !!
+    }
+
     fun dot(v: Vector): Fraction {
         assert(dimension == v.dimension)
         var sum: Fraction = Fraction.ZERO

@@ -35,7 +35,7 @@ class AugmentedMatrix(val left: Matrix, val right: Matrix) {
         }
 
         for (i in matrix.entries.indices) {
-            output += "\n[ "
+            output += "\n[  "
             for (j in left.entries[i].indices) {
                 val remaining = columnWidths[j]
                 val string = left.entries[i][j].toString()
@@ -58,6 +58,6 @@ class AugmentedMatrix(val left: Matrix, val right: Matrix) {
             output += "]"
         }
 
-        return output
+        return output + "\n"
     }
 }
