@@ -4,12 +4,6 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
     val rows: Int = entries.size
     val columns: Int = entries[0].size
 
-    constructor(space: Array<Vector>): this((Array(space[0].dimension) { j -> Array(space.size) { i -> space[i].elements[j] } } )) {
-        for (v in space) {
-            assert(v.dimension == space[0].dimension)
-        }
-    }
-
     companion object {
         fun identity(size: Int): Matrix {
             return Matrix(Array(size) { i-> Array(size) { j -> if (i == j) Fraction.ONE else Fraction.ZERO } } )
@@ -20,12 +14,6 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
         return AugmentedMatrix(this, m)
     }
 
-    /*
-    fun augment(v: Vector): AugmentedMatrix {
-        return AugmentedMatrix(this, )
-    }
-
-     */
 
     fun row(i: Int): Vector {
         return Vector(entries[i])
@@ -74,7 +62,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
             var currentPivotRowIndex = 0
             while (currentColumnIndex < rows) {
                 val currentColumn: Array<Fraction> = column(currentColumnIndex).elements
-                var pivotRowIndex: Int = rows - 1
+                var pivotRowIndex: Int = currentPivotRowIndex
                 var largestRelativeMax = 0.0
                 for (i in currentPivotRowIndex until rows) {
                     val relativeMax = currentColumn[i].magnitude() / row(i).max().magnitude()
@@ -127,7 +115,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
             var currentPivotRowIndex = 0
             while (currentColumnIndex < rows) {
                 val currentColumn: Array<Fraction> = column(currentColumnIndex).elements
-                var pivotRowIndex: Int = rows - 1
+                var pivotRowIndex: Int = currentPivotRowIndex
                 var largestRelativeMax = 0.0
                 for (i in currentPivotRowIndex until rows) {
                     val relativeMax = currentColumn[i].magnitude() / row(i).max().magnitude()
@@ -188,7 +176,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
         if (left == identity()) {
             return right
         } else {
-            throw(Exception("$augmented\nMatrix is singular (inverse does not exist)"))
+            throw(Exception("\n$augmented\nMatrix is singular (inverse does not exist)"))
         }
     }
 
@@ -225,7 +213,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
         }
 
         for (i in 0 until rows) {
-            output += "\n[  "
+            output += "[  "
             for (j in 0 until columns) {
                 val remaining = columnWidths[j]
                 val string = entries[i][j].toString()
@@ -235,9 +223,9 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
                 }
             }
 
-            output += "]"
+            output += "]\n"
         }
 
-        return output + "\n"
+        return output
     }
 }
