@@ -1,3 +1,5 @@
+import kotlin.math.max
+
 class AugmentedMatrix(val left: Matrix, val right: Matrix) {
     val matrix: Matrix
 
@@ -22,15 +24,35 @@ class AugmentedMatrix(val left: Matrix, val right: Matrix) {
 
     override fun toString(): String {
         var output = ""
+        val columnWidths = Array(matrix.columns) { 0 }
+        for (j in 0 until matrix.columns) {
+            var maxLength = 0
+            for (i in 0 until matrix.rows) {
+                maxLength = max(matrix.entries[i][j].toString().length, maxLength)
+            }
+
+            columnWidths[j] = maxLength
+        }
+
         for (i in matrix.entries.indices) {
             output += "\n[ "
             for (j in left.entries[i].indices) {
-                output += left.entries[i][j].toString() + " "
+                val remaining = columnWidths[j]
+                val string = left.entries[i][j].toString()
+                output += string
+                for (k in 0 until remaining - string.length + 2) {
+                    output += " "
+                }
             }
 
-            output += "| "
+            output += "|  "
             for (j in right.entries[i].indices) {
-                output += right.entries[i][j].toString() + " "
+                val remaining = columnWidths[j + left.columns]
+                val string = right.entries[i][j].toString()
+                output += string
+                for (k in 0 until remaining - string.length + 2) {
+                    output += " "
+                }
             }
 
             output += "]"

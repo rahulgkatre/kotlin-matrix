@@ -1,17 +1,14 @@
+import kotlin.math.max
+
 data class Matrix(val entries: Array<Array<Fraction>>) {
     val rows: Int = entries.size
     val columns: Int = entries[0].size
 
-    /*
-    constructor(space: Array<Vector>): Matrix {
+    constructor(space: Array<Vector>): this((Array(space[0].dimension) { j -> Array(space.size) { i -> space[i].elements[j] } } )) {
         for (v in space) {
             assert(v.dimension == space[0].dimension)
         }
-
-        return Matrix((Array(space[0].dimension) { j -> Array(space.size) { i -> space[i].elements[j] } } ) )
     }
-
-     */
 
     companion object {
         fun identity(size: Int): Matrix {
@@ -47,7 +44,7 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
     }
 
     operator fun unaryMinus(): Matrix {
-        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] } } )
+        return Matrix(Array(rows) { i -> Array(columns) { j -> -entries[i][j] } } )
     }
 
     operator fun plus(m: Matrix): Matrix {
@@ -57,10 +54,11 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
 
     operator fun minus(m: Matrix): Matrix {
         assert(rows == m.rows && columns == m.columns)
-        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] + m.entries[i][j] } } )
+        return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] - m.entries[i][j] } } )
     }
 
     operator fun times(f: Fraction): Matrix {
+        assert(f.denominator != Complex.ZERO)
         return Matrix(Array(rows) { i -> Array(columns) { j -> entries[i][j] * f } } )
     }
 
@@ -99,7 +97,9 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
                 val pivotRow = Vector(copy[currentPivotRowIndex])
                 val pivot = pivotRow.elements[currentColumnIndex]
                 val pivotScalar = pivot.invert()
-                copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                if (pivotScalar != Fraction.ONE) {
+                    copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                }
 
                 for (i in currentPivotRowIndex + 1 until rows) {
                     if (i != currentPivotRowIndex) {
@@ -152,7 +152,9 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
                 val pivotRow = Vector(copy[currentPivotRowIndex])
                 val pivot = pivotRow.elements[currentColumnIndex]
                 val pivotScalar = pivot.invert()
-                copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                if (pivotScalar != Fraction.ONE) {
+                    copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                }
 
                 for (i in 0 until rows) {
                     if (i != currentPivotRowIndex) {
@@ -176,9 +178,17 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
     }
 
     fun inverse(): Matrix {
-        val augmented = augment(identity()).rref()
-        val left = augmented.left
-        val right = augmented.right
+        val augmented: AugmentedMatrix
+        val left: Matrix
+        val right: Matrix
+        try {
+            augmented = augment(identity()).rref()
+            left = augmented.left
+            right = augmented.right
+        } catch(e: Exception) {
+            throw(Exception("Matrix is singular (inverse does not exist)"))
+        }
+
         if (left == identity()) {
             return right
         } else {
@@ -207,9 +217,29 @@ data class Matrix(val entries: Array<Array<Fraction>>) {
     }
 
     override fun toString(): String {
-        var output = "\n"
-        for (i in entries.indices) {
-            output += row(i).toString() + "\n"
+        var output = ""
+        val columnWidths = Array(columns) { 0 }
+        for (j in 0 until columns) {
+            var maxLength = 0
+            for (i in 0 until rows) {
+                maxLength = max(entries[i][j].toString().length, maxLength)
+            }
+
+            columnWidths[j] = maxLength
+        }
+
+        for (i in 0 until rows) {
+            output += "\n[  "
+            for (j in 0 until columns) {
+                val remaining = columnWidths[j]
+                val string = entries[i][j].toString()
+                output += string
+                for (k in 0 until remaining - string.length + 2) {
+                    output += " "
+                }
+            }
+
+            output += "]"
         }
 
         return output
