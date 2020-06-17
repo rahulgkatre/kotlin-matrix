@@ -15,6 +15,10 @@ fun augment(left: Matrix, right: Matrix): AugmentedMatrix {
     return AugmentedMatrix(left, right)
 }
 
+fun augment(m: Matrix, v: Vector): AugmentedMatrix {
+    return AugmentedMatrix(m, Matrix(arrayOf(v)))
+}
+
 fun transpose(m: Matrix): Matrix {
     return Matrix(Array(m.columns) { i -> Array(m.rows) { j -> m.get(j, i) } } )
 }

@@ -2,8 +2,6 @@ package matrix
 
 import kotlin.math.max
 
-
-
 class AugmentedMatrix(val left: Matrix, val right: Matrix) {
     val matrix: Matrix
 

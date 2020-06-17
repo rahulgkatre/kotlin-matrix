@@ -3,6 +3,14 @@ package matrix
 data class Vector(val elements: Array<Fraction>) {
     val dimension = elements.size
 
+    init {
+        for (e in elements) {
+            if (e == null) {
+                throw(Exception("Vector cannot contain null elements"))
+            }
+        }
+    }
+
     operator fun unaryMinus(): Vector {
         return Vector(Array(dimension) { i -> -elements[i] } )
     }

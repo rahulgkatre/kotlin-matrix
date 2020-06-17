@@ -6,6 +6,14 @@ data class Matrix(private val entries: Array<Array<Fraction>>) {
     val rows: Int = entries.size
     val columns: Int = entries[0].size
 
+    constructor(space: Array<Vector>): this(Array(space[0].dimension) { i -> Array(space.size) { j -> space[j].elements[i] } } ) {
+        for (v in space) {
+            if (v.dimension != space[0].dimension) {
+                throw(Exception("All vectors in a vector space must have the same dimension"))
+            }
+        }
+    }
+
     fun row(i: Int): Vector {
         return Vector(entries[i])
     }
