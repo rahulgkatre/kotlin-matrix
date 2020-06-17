@@ -1,14 +1,22 @@
 package matrix
 
+import kotlin.math.sqrt
+
 data class Vector(val elements: Array<Fraction>) {
     val dimension = elements.size
+    //val ZERO = Vector(Array(dimension) { i -> Fraction.ZERO } )
 
-    init {
+    fun square(): Fraction {
+        var sum = Fraction.ZERO
         for (e in elements) {
-            if (e == null) {
-                throw(Exception("Vector cannot contain null elements"))
-            }
+            sum += e * e.conjugate()
         }
+
+        return sum
+    }
+
+    fun magnitude(): Double {
+        return sqrt(square().magnitude())
     }
 
     operator fun unaryMinus(): Vector {
@@ -39,11 +47,12 @@ data class Vector(val elements: Array<Fraction>) {
         assert(dimension == v.dimension)
         var sum: Fraction = Fraction.ZERO
         for (i in elements.indices) {
-            sum += elements[i] * v.elements[i]
+            sum += elements[i].conjugate() * v.elements[i]
         }
 
         return sum
     }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -50,6 +50,11 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
         return Fraction(denominator, numerator)
     }
 
+    fun conjugate(): Fraction {
+        val f = simplify()
+        return Fraction(numerator.conjugate(), denominator)
+    }
+
     fun magnitude(): Double {
         return numerator.magnitude() / denominator.magnitude()
     }

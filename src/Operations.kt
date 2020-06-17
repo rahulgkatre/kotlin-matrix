@@ -1,6 +1,18 @@
 package matrix
 
 /**
+ * Functions for vectors
+ */
+
+/*
+fun proj(v: Vector, u: Vector): Vector {
+    assert(u != u.ZERO && v.dimension == u.dimension)
+    return v * ((v * u) / (v * v))
+}
+
+ */
+
+/**
  * Functions for matrices
  */
 fun identity(size: Int): Matrix {
@@ -146,7 +158,7 @@ fun inverse(m: Matrix): Matrix {
     }
 }
 
-fun lu(m: Matrix): Array<Matrix> {
+fun lup(m: Matrix): Array<Matrix> {
     assert(m.rows == m.columns)
     val permutation = identity(m).entries()
     val lower = identity(m).entries()
@@ -198,12 +210,12 @@ fun lu(m: Matrix): Array<Matrix> {
         currentPivotRowIndex++
     }
 
-    return arrayOf(Matrix(lower), Matrix(upper))
+    return arrayOf(Matrix(lower), Matrix(upper), Matrix(permutation))
 }
 
 fun det(m: Matrix): Fraction {
     assert(m.rows == m.columns)
-    val lu = lu(m)
+    val lu = lup(m)
     val lower = lu[0].entries()
     val upper = lu[1].entries()
     var determinant = Fraction.ONE
@@ -213,6 +225,34 @@ fun det(m: Matrix): Fraction {
 
     return determinant
 }
+
+/*
+fun qr(m: Matrix): Array<Matrix> {
+    assert(m.rows == m.columns)
+    var us = Array(m.columns) { j -> m.column(0).ZERO }
+    var es = Array(m.columns) { j -> m.column(0).ZERO }
+    for (j in 0 until m.columns) {
+        val a = m.column(j)
+        var u = a
+        for (k in 0 until j) {
+            u -= proj(u, m.column(k))
+        }
+
+        val e = u * Fraction(u.magnitude()).invert()
+        us[j] = u
+        es[j] = e
+    }
+
+    val q = Matrix(Array(m.columns) { j -> es[j] } )
+    val rv = Array(m.columns) { j -> m.column(0).ZERO }
+    for (j in 0 until m.columns) {
+        var ri = Array(m.rows) { i -> Fraction.ZERO }
+        for (i in 0 until j) {
+            ri
+        }
+    }
+}
+ */
 
 /**
  * Functions for augmented matrices

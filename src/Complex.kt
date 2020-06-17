@@ -10,8 +10,12 @@ data class Complex(val real: Int, val imaginary: Int) {
         val ONE = Complex(1, 0)
     }
 
+    fun square(): Int {
+        return real * real + imaginary * imaginary
+    }
+
     fun magnitude(): Double {
-        return sqrt(((real * real) + (imaginary * imaginary).toDouble()))
+        return sqrt(square().toDouble())
     }
 
     fun conjugate(): Complex {
