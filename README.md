@@ -16,4 +16,4 @@ So far, the features of my program include:
 
 - Inverse (using Gaussian elimination) and determinants (using LU)
 
-Inter-matrix operations (and inter-complex, inter-fraction, etc.) are handled by the basic operators (+, -, *) while other operations are package wide functions that can be called after `import matrix.*` has been added to the top of your file and the module has been incporated into your project.
+Inter-matrix operations (and inter-complex, inter-fraction, etc.) are handled by the basic operators (+, -, *) while other operations are package wide functions that can be called after the line `import matrix.*` has been added to the top of your file and the module has been incorporated into your project. This was done to simplify syntax when calling functions upon matrices. 
