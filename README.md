@@ -14,4 +14,4 @@ So far, the features of my program include:
 
 - Inverse (using Gaussian elimination) and determinants (using LU)
 
-Inter-matrix operations (and inter-complex, inter-fraction, etc.) are handled by the basic operators (+, -, *) while other operations are package wide functions that can be called after `import matrix.*` has been added to the top of your file. I will be adding further instructions to incoporate this package into Kotlin projects.
+Inter-matrix operations (and inter-complex, inter-fraction, etc.) are handled by the basic operators (+, -, *) while other operations are package wide functions that can be called after `import matrix.*` has been added to the top of your file and the module has been incporated into your project.
