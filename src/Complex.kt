@@ -102,8 +102,8 @@ data class Complex(val real: Int, val imaginary: Int) {
     }
 
     override fun toString(): String {
-        val r = "$real"
-        val i: String = if (imaginary == 0) "" else "$imaginary" + "i"
-        return r + i
+        val r = (if (real < 0) "%d" else " %d").format(real)
+        val i = if (imaginary == 0) "" else if (imaginary < 0) " - %di".format(-imaginary) else " + %di".format(imaginary)
+        return if (real == 0 && imaginary != 0) return i else return r + i
     }
 }

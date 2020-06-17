@@ -28,7 +28,7 @@ fun ref(m: Matrix): Matrix {
     var currentColumnIndex = 0
     var currentPivotRowIndex = 0
     while (currentColumnIndex < m.rows) {
-        val currentColumn: Array<Fraction> = m.column(currentColumnIndex).elements
+        val currentColumn: Array<Fraction> = Matrix(copy).column(currentColumnIndex).elements
         var pivotRowIndex: Int = currentPivotRowIndex
         var largestRelativeMax = 0.0
         for (i in currentPivotRowIndex until m.rows) {
@@ -44,6 +44,7 @@ fun ref(m: Matrix): Matrix {
                 val swap = copy[currentPivotRowIndex]
                 copy[currentPivotRowIndex] = copy[pivotRowIndex]
                 copy[pivotRowIndex] = swap
+                //println("R" + (currentPivotRowIndex + 1) + " <-> R" + (pivotRowIndex + 1))
             }
 
             val pivotRow = Vector(copy[currentPivotRowIndex])
@@ -51,6 +52,7 @@ fun ref(m: Matrix): Matrix {
             val pivotScalar = pivot.invert()
             if (pivotScalar != Fraction.ONE) {
                 copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                //println("R" + (currentPivotRowIndex + 1) + " = $pivotScalar * R" + (currentPivotRowIndex + 1))
             }
 
             for (i in currentPivotRowIndex + 1 until m.rows) {
@@ -61,6 +63,7 @@ fun ref(m: Matrix): Matrix {
                     val scaledPivotRow = pivotRow * scalar
                     val reducedRow = currentRow - scaledPivotRow
                     copy[i] = reducedRow.elements
+                    //println("R" + (i + 1) + " = R" + (i + 1) + " + $scalar * R" + (currentPivotRowIndex + 1))
                 }
             }
         }
@@ -77,7 +80,7 @@ fun rref(m: Matrix): Matrix {
     var currentColumnIndex = 0
     var currentPivotRowIndex = 0
     while (currentColumnIndex < m.rows) {
-        val currentColumn: Array<Fraction> = m.column(currentColumnIndex).elements
+        val currentColumn: Array<Fraction> = Matrix(copy).column(currentColumnIndex).elements
         var pivotRowIndex: Int = currentPivotRowIndex
         var largestRelativeMax = 0.0
         for (i in currentPivotRowIndex until m.rows) {
@@ -93,6 +96,7 @@ fun rref(m: Matrix): Matrix {
                 val swap = copy[currentPivotRowIndex]
                 copy[currentPivotRowIndex] = copy[pivotRowIndex]
                 copy[pivotRowIndex] = swap
+                //println("R" + (currentPivotRowIndex + 1) + " <-> R" + (pivotRowIndex + 1))
             }
 
             val pivotRow = Vector(copy[currentPivotRowIndex])
@@ -100,6 +104,7 @@ fun rref(m: Matrix): Matrix {
             val pivotScalar = pivot.invert()
             if (pivotScalar != Fraction.ONE) {
                 copy[currentPivotRowIndex] = (pivotRow * pivotScalar).elements
+                //println("R" + (currentPivotRowIndex + 1) + " = $pivotScalar * R" + (currentPivotRowIndex + 1))
             }
 
             for (i in 0 until m.rows) {
@@ -110,6 +115,7 @@ fun rref(m: Matrix): Matrix {
                     val scaledPivotRow = pivotRow * scalar
                     val reducedRow = currentRow - scaledPivotRow
                     copy[i] = reducedRow.elements
+                    //println("R" + (i + 1) + " = R" + (i + 1) + " + $scalar * R" + (currentPivotRowIndex + 1))
                 }
             }
         }
@@ -138,6 +144,74 @@ fun inverse(m: Matrix): Matrix {
     } else {
         throw(Exception("\n$augmented\nMatrix is singular (inverse does not exist)"))
     }
+}
+
+fun lu(m: Matrix): Array<Matrix> {
+    assert(m.rows == m.columns)
+    val permutation = identity(m).entries()
+    val lower = identity(m).entries()
+    val upper = m.entries()
+    var currentColumnIndex = 0
+    var currentPivotRowIndex = 0
+    while (currentColumnIndex < m.columns) {
+        val currentColumn: Array<Fraction> = Matrix(upper).column(currentColumnIndex).elements
+        var pivotRowIndex: Int = currentPivotRowIndex
+        var largestRelativeMax = 0.0
+        for (i in currentPivotRowIndex until m.rows) {
+            val relativeMax = currentColumn[i].magnitude() / m.row(i).max().magnitude()
+            if (relativeMax > largestRelativeMax) {
+                pivotRowIndex = i
+                largestRelativeMax = relativeMax
+            }
+        }
+
+        if (largestRelativeMax > 0.0) {
+            if (currentPivotRowIndex != pivotRowIndex) {
+                val swap = upper[currentPivotRowIndex]
+                upper[currentPivotRowIndex] = upper[pivotRowIndex]
+                upper[pivotRowIndex] = swap
+                //println("R" + (currentPivotRowIndex + 1) + " <-> R" + (pivotRowIndex + 1))
+            }
+
+            val pivotRow = Vector(upper[currentPivotRowIndex])
+            val pivot = pivotRow.elements[currentColumnIndex]
+            val pivotScalar = pivot.invert()
+            for (i in currentPivotRowIndex + 1 until m.rows) {
+                val currentRow = Vector(upper[i])
+                val leadingEntry = currentRow.elements[currentColumnIndex]
+                val scalar = leadingEntry * pivotScalar
+                val scaledPivotRow = pivotRow * scalar
+                val reducedRow = currentRow - scaledPivotRow
+                upper[i] = reducedRow.elements
+                //println("R" + (i + 1) + " = R" + (i + 1) + " + $scalar * R" + (currentPivotRowIndex + 1))
+                lower[i][currentColumnIndex] = scalar
+            }
+
+            if (currentPivotRowIndex != pivotRowIndex) {
+                val swap = permutation[currentPivotRowIndex]
+                permutation[currentPivotRowIndex] = permutation[pivotRowIndex]
+                permutation[pivotRowIndex] = swap
+            }
+        }
+
+        currentColumnIndex++
+        currentPivotRowIndex++
+    }
+
+    return arrayOf(Matrix(lower), Matrix(upper))
+}
+
+fun det(m: Matrix): Fraction {
+    assert(m.rows == m.columns)
+    val lu = lu(m)
+    val lower = lu[0].entries()
+    val upper = lu[1].entries()
+    var determinant = Fraction.ONE
+    for (i in 0 until m.rows) {
+        determinant *= lower[i][i] * upper[i][i]
+    }
+
+    return determinant
 }
 
 /**

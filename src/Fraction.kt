@@ -86,7 +86,7 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
         if (denominator == Complex.ONE) {
             return "$numerator"
         } else {
-            return "$numerator / $denominator"
+            return if (denominator.real < 0 || (denominator.real == 0 && denominator.imaginary < 0)) "$numerator / $denominator" else "$numerator /$denominator"
         }
     }
 }

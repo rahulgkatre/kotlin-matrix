@@ -87,7 +87,7 @@ data class Matrix(private val entries: Array<Array<Fraction>>) {
         }
 
         for (i in 0 until rows) {
-            output += "[  "
+            output += "[ "
             for (j in 0 until columns) {
                 val remaining = columnWidths[j]
                 val string = entries[i][j].toString()
