@@ -8,6 +8,8 @@ So far, the features of my program include:
 
 - Matrix addition, subtraction, and multiplication
 
+- Augmented matrices and terminal outputs for all included data structures
+
 - Gaussian elimination using scaled partial pivoting to obtain REF and RREF forms
 
 - LU decomposition 
