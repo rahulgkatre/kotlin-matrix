@@ -2,12 +2,12 @@ package matrix
 
 import kotlin.math.max
 
-class AugmentedMatrix(val left: Matrix, val right: Matrix) {
+data class AugmentedMatrix(val left: Matrix, val right: Matrix) {
     val matrix: Matrix
 
     init {
         assert(left.rows == right.rows)
-        this.matrix = Matrix(Array(left.rows) { i -> Array(left.columns + right.columns) { j -> if (j < left.columns) left.get(i, j) else right.get(i, j - left.columns) } } )
+        this.matrix = Matrix(Array(left.rows) { i -> Array(left.columns + right.columns) { j -> if (j < left.columns) left.get(i, j) else right.get(i, j - left.columns) } })
     }
 
     override fun toString(): String {
@@ -48,4 +48,18 @@ class AugmentedMatrix(val left: Matrix, val right: Matrix) {
 
         return output
     }
+}
+
+fun ref(am: AugmentedMatrix): AugmentedMatrix {
+    val ref = ref(am.matrix)
+    val l = Matrix(Array(am.left.rows) { i -> Array(am.left.columns) { j -> ref.get(i, j) } })
+    val r = Matrix(Array(am.right.rows) { i -> Array(am.right.columns) { j -> ref.get(i, j + am.left.columns) } })
+    return AugmentedMatrix(l, r)
+}
+
+fun rref(am: AugmentedMatrix): AugmentedMatrix {
+    val rref = rref(am.matrix)
+    val l = Matrix(Array(am.left.rows) { i -> Array(am.left.columns) { j -> rref.get(i, j) } })
+    val r = Matrix(Array(am.right.rows) { i -> Array(am.right.columns) { j -> rref.get(i, j + am.left.columns) } })
+    return AugmentedMatrix(l, r)
 }

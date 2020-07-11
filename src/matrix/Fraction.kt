@@ -26,21 +26,30 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
             throw(Exception("Cannot divide by 0"))
         }
 
-        var f = if (denominator.imaginary != 0) { Fraction(numerator * denominator.conjugate(), denominator * denominator.conjugate()) } else { this }
-        val gcd = gcd(gcd(abs(f.numerator.real), abs(f.numerator.imaginary)), abs(f.denominator.real))
+        var f: Fraction
+        if (numerator.isDecimal() || denominator.isDecimal()) {
+            f = this
+        } else {
+            f = if (denominator.imaginary.toInt() != 0) {
+                Fraction(numerator * denominator.conjugate(), denominator * denominator.conjugate())
+            } else {
+                this
+            }
+            val gcd = gcd(gcd(abs(f.numerator.real.toInt()), abs(f.numerator.imaginary.toInt())), abs(f.denominator.real.toInt()))
 
-        if (gcd > 0) {
-            f = Fraction(Complex(f.numerator.real / gcd, f.numerator.imaginary / gcd), Complex(f.denominator.real / gcd))
-        }
+            if (gcd > 0) {
+                f = Fraction(Complex(f.numerator.real.toInt() / gcd, f.numerator.imaginary.toInt() / gcd), Complex(f.denominator.real.toInt() / gcd))
+            }
 
-        if (f.denominator.real < 0) {
-            f = Fraction(-f.numerator, -f.denominator)
-        }
+            if (f.denominator.real < 0) {
+                f = Fraction(-f.numerator, -f.denominator)
+            }
 
-        if (numerator == Complex.ZERO) {
-            f = Fraction(Complex.ZERO, Complex.ONE)
-        } else if (numerator == denominator) {
-            f = Fraction(Complex.ONE, Complex.ONE)
+            if (numerator == Complex.ZERO) {
+                f = Fraction(Complex.ZERO, Complex.ONE)
+            } else if (numerator == denominator) {
+                f = Fraction(Complex.ONE, Complex.ONE)
+            }
         }
 
         return f
@@ -76,11 +85,11 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
     }
 
     operator fun times(f: Fraction): Fraction {
-        return Fraction(numerator * f.numerator,  denominator * f.denominator).simplify()
+        return Fraction(numerator * f.numerator, denominator * f.denominator).simplify()
     }
 
     operator fun div(f: Fraction): Fraction {
-        return Fraction(numerator * f.denominator,  denominator * f.numerator).simplify()
+        return Fraction(numerator * f.denominator, denominator * f.numerator).simplify()
     }
 
     operator fun compareTo(f: Fraction): Int {
@@ -91,7 +100,7 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
         if (denominator == Complex.ONE) {
             return "$numerator"
         } else {
-            return if (denominator.real < 0 || (denominator.real == 0 && denominator.imaginary < 0)) "$numerator / $denominator" else "$numerator /$denominator"
+            return if (denominator.real < 0 || (denominator.real == 0.0 && denominator.imaginary < 0)) "$numerator / $denominator" else "$numerator /$denominator"
         }
     }
 }

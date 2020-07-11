@@ -1,4 +1,4 @@
-# Kotlin Matrix
+# Kotlin matrix.Matrix
 
 This is some code I am in the process of writing that has the ability to do matrix algebra using Kotlin. This is an evolution of another project of mine where I computed matrix multiplication, determinants, and inverses using Java. I chose Kotlin for this project because of the ability to overload operators, a useful feature when working with some custom data strutures (complex numbers, fractions, vectors, and matrices).
 
@@ -6,7 +6,7 @@ I implemented my own complex number class as my Java versions were not able to w
 
 So far, the features of my program include:
 
-- Matrix addition, subtraction, and multiplication
+- matrix.Matrix addition, subtraction, and multiplication
 
 - Augmented matrices and terminal outputs for all included data structures
 

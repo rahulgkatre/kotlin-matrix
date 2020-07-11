@@ -4,7 +4,10 @@ import kotlin.math.sqrt
 
 data class Vector(val elements: Array<Fraction>) {
     val dimension = elements.size
-    //val ZERO = Vector(Array(dimension) { i -> Fraction.ZERO } )
+
+    fun zero(): Vector {
+        return Vector(Array(dimension) { Fraction.ZERO })
+    }
 
     fun square(): Fraction {
         var sum = Fraction.ZERO
@@ -20,11 +23,11 @@ data class Vector(val elements: Array<Fraction>) {
     }
 
     operator fun unaryMinus(): Vector {
-        return Vector(Array(dimension) { i -> -elements[i] } )
+        return Vector(Array(dimension) { i -> -elements[i] })
     }
 
     operator fun plus(v: Vector): Vector {
-        return Vector(Array(dimension) { i -> elements[i] + v.elements[i] } )
+        return Vector(Array(dimension) { i -> elements[i] + v.elements[i] })
     }
 
     operator fun minus(v: Vector): Vector {
@@ -32,11 +35,11 @@ data class Vector(val elements: Array<Fraction>) {
     }
 
     operator fun times(f: Fraction): Vector {
-        return Vector(Array(dimension) { i -> elements[i] * f } )
+        return Vector(Array(dimension) { i -> elements[i] * f })
     }
 
     operator fun div(f: Fraction): Vector {
-        return Vector(Array(dimension) { i -> elements[i] / f } )
+        return Vector(Array(dimension) { i -> elements[i] / f })
     }
 
     fun max(): Fraction {
@@ -80,4 +83,9 @@ data class Vector(val elements: Array<Fraction>) {
 
         return "$output]"
     }
+}
+
+fun proj(v: Vector, u: Vector): Vector {
+    assert(u != u.zero() && v.dimension == u.dimension)
+    return v * ((v * u) / (v * v))
 }
