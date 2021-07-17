@@ -79,7 +79,7 @@ data class Fraction(val numerator: Complex, val denominator: Complex) {
     }
 
     operator fun minus(f: Fraction): Fraction {
-        val n = f.numerator * denominator - numerator * f.denominator
+        val n = numerator * f.denominator - f.numerator * denominator
         val d = denominator * f.denominator
         return Fraction(n, d).simplify()
     }
